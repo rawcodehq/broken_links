@@ -1,0 +1,10 @@
+<h1>Analysis for '<%= @url %>'</h1>
+
+<h2>Broken links</h2>
+<ul>
+  <%= for broken_link <- @broken_links do %>
+  <li>
+    [<%= broken_link.text %>](<%= broken_link.href %>)
+  </li>
+  <% end %>
+</ul>

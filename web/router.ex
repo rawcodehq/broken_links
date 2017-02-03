@@ -17,6 +17,7 @@ defmodule BrokenLinks.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/analyze", PageController, :analyze
   end
 
   # Other scopes may use custom stacks.

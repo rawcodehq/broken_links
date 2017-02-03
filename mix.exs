@@ -17,7 +17,7 @@ defmodule BrokenLinks.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {BrokenLinks, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext]]
+     extra_applications: [:logger]]
   end
 
   # Specifies which paths to compile per environment.
@@ -33,6 +33,9 @@ defmodule BrokenLinks.Mixfile do
      {:phoenix_html, "~> 2.6"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:httpoison, "~> 0.10.0"},
+     {:floki, "~>0.13.1"}
+   ]
   end
 end
