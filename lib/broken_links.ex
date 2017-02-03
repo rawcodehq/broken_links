@@ -6,6 +6,8 @@ defmodule BrokenLinks do
   def start(_type, _args) do
     import Supervisor.Spec
 
+    :urls = :ets.new(:urls, [:named_table, :public, {:write_concurrency, true}, {:read_concurrency, true}])
+
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts

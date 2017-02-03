@@ -1,4 +1,5 @@
 defmodule BrokenLinks.PageAnalyzer do
+  import Logger, only: [debug: 1, error: 1]
   # returns a list of broken urls
   #0. Allow the user to enter a url
   #3. Try to download html for the links from (2)
@@ -8,16 +9,20 @@ defmodule BrokenLinks.PageAnalyzer do
     case HTTPoison.get(url, [], [ ssl: [{:versions, [:'tlsv1.2']}] ]) do
       {:ok, %HTTPoison.Response{body: body}} ->
         # 2. Parse out the links from (1)
-        links = parse_links(url, body)
-        broken_links = Enum.filter(links, &broken_link?/1)
+        url
+        |> parse_links(body)
+        |> Enum.each(fn link ->
+          [{_, broken_links}] = :ets.lookup(:urls, url)
+          :ets.insert(:urls, {url, [{link, broken_link?(link)} | broken_links]})
+        end)
 
-        {:ok, broken_links}
+        :ok
       oops ->
-        {:error, inspect(oops)}
+        error("ERROR: #{inspect(oops)}")
+        :error
     end
   end
 
-  import Logger, only: [debug: 1]
   defp broken_link?(%{href: href}) do
     debug("checking link: #{inspect href}")
     case HTTPoison.get(href, [], [ ssl: [{:versions, [:'tlsv1.2']}] ]) do
