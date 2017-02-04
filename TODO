@@ -11,3 +11,13 @@
 
   1. Parallelize our work
   2. Show info in a usable form
+
+:urls
+{starting_url, [{url, false/true}]}
+
+:urls
+{url, [
+  #internal_links
+  {link1, [broken_links]}
+]}
+

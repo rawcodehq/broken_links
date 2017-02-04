@@ -1,15 +1,21 @@
 <h1>Analysis for '<%= @url %>'</h1>
 
-<h2>Broken links</h2>
+<h2>Pages with broken links (<%= length(@broken_links) %>)</h2>
 <ul>
-  <%= for {broken_link, is_broken} <- @broken_links do %>
+  <%= for %{href: href, broken_links: broken_links} <- @broken_links do %>
   <li>
-    [<%= inspect broken_link.text %>](<%= broken_link.href %>)
-    <%= if is_broken do %>
-      <span style='color: red;font-size: 4em;'>✗</span>
-    <% else %>
-      <span style='color: green;font-size: 4em;'>✓</span>
-    <% end %>
+    <%= inspect href %>
+    Number of Broken Links <%= length(broken_links) %>
   </li>
   <% end %>
 </ul>
+
+<h2>Pages without broken links (<%= length(@good_links) %>)</h2>
+<ul>
+  <%= for %{href: href} <- @good_links do %>
+  <li>
+    <%= href %>
+  </li>
+  <% end %>
+</ul>
+

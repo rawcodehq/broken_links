@@ -9,9 +9,11 @@ defmodule BrokenLinks.PageController do
   import Logger, only: [debug: 1]
   def analyze(conn, %{"url" => url}) do
     PageAnalyzer.nq(url)
-    broken_links =  PageAnalyzer.broken_links_for(url)
 
-    render conn, "analyze.html", url: url, broken_links: broken_links
+    links =  PageAnalyzer.result_for(url)
+    {good_links, broken_links} = Enum.split_with(links, fn %{broken_links: broken_links} -> length(broken_links) == 0 end)
+
+    render conn, "analyze.html", url: url, good_links: good_links, broken_links: broken_links
   end
 end
 

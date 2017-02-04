@@ -5,6 +5,18 @@ defmodule BrokenLinks.PageAnalyzer do
     :ets.tab2list(:urls) |> Enum.map(fn {k, _} -> k end)
   end
 
+  # return
+  # [%{link: link, broken_links: []}]
+  def result_for(url) do
+    host = URI.parse(url).host
+    links
+    |> Enum.filter(fn href -> URI.parse(href).host == host end)
+    |> Enum.map(fn href ->
+      [{_, all_links}] = :ets.lookup(:urls, href)
+      %{href: href, broken_links: Enum.filter(all_links, fn {_, broken?} -> broken? end)}
+    end)
+  end
+
   def nq(url) do
     if :ets.member(:urls, url) do
       debug("existing url fetching from ets")
