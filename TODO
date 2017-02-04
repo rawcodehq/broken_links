@@ -3,3 +3,8 @@
   2. Parse out the links from (1)
   3. Try to download html for the links from (2)
     if it fails for a link, it means that link is broken
+
+  Allow the user to enter the url
+  +1. Analyzing the page
+  +2. Get all the internal links, and q them up for analysis
+  *3. Showing all the links that have been processed

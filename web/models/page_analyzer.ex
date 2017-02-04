@@ -1,5 +1,24 @@
 defmodule BrokenLinks.PageAnalyzer do
   import Logger, only: [debug: 1, error: 1]
+
+  def nq(url) do
+    if :ets.member(:urls, url) do
+      debug("existing url fetching from ets")
+    else
+      debug("new url insert into ets")
+      :ets.insert(:urls, {url, []})
+      spawn(BrokenLinks.PageAnalyzer, :analyze, [url])
+      []
+    end
+  end
+
+  def broken_links_for(url) do
+    case :ets.lookup(:urls, url) do
+      [{_, broken_links}] -> broken_links
+      _ -> []
+    end
+  end
+
   # returns a list of broken urls
   #0. Allow the user to enter a url
   #3. Try to download html for the links from (2)
@@ -13,6 +32,11 @@ defmodule BrokenLinks.PageAnalyzer do
         |> parse_links(body)
         |> Enum.each(fn link ->
           [{_, broken_links}] = :ets.lookup(:urls, url)
+          # q the internal links
+          if internal_link?(url, link.href) do
+            nq(link.href)
+          end
+
           :ets.insert(:urls, {url, [{link, broken_link?(link)} | broken_links]})
         end)
 
@@ -21,6 +45,11 @@ defmodule BrokenLinks.PageAnalyzer do
         error("ERROR: #{inspect(oops)}")
         :error
     end
+  end
+
+  # htttp://minhajuddin.com htttp://minhajuddin.com/about
+  defp internal_link?(starting_url, href) do
+    URI.parse(starting_url).host == URI.parse(href).host
   end
 
   defp broken_link?(%{href: href}) do
