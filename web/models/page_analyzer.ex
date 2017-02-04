@@ -1,6 +1,10 @@
 defmodule BrokenLinks.PageAnalyzer do
   import Logger, only: [debug: 1, error: 1]
 
+  def links do
+    :ets.tab2list(:urls) |> Enum.map(fn {k, _} -> k end)
+  end
+
   def nq(url) do
     if :ets.member(:urls, url) do
       debug("existing url fetching from ets")

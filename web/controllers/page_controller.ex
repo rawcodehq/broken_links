@@ -3,7 +3,7 @@ defmodule BrokenLinks.PageController do
   alias BrokenLinks.PageAnalyzer
 
   def index(conn, _params) do
-    render conn, "index.html"
+    render conn, "index.html", links: PageAnalyzer.links
   end
 
   import Logger, only: [debug: 1]

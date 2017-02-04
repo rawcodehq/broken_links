@@ -2,3 +2,13 @@
   <input id="url" type="text" name="url" placeholder="Enter the URL...">
   <input type="submit" value="Find broken links!" />
 </form>
+
+<h2>Links processed</h2>
+
+<ul>
+  <%= for href <- @links do %>
+    <li>
+      <%= link href, to: '/analyze?url=#{href}' %>
+    </li>
+  <% end %>
+</ul>
