@@ -32,17 +32,19 @@ defmodule BrokenLinks.PageAnalyzer do
     case HTTPoison.get(url, [], [ ssl: [{:versions, [:'tlsv1.2']}] ]) do
       {:ok, %HTTPoison.Response{body: body}} ->
         # 2. Parse out the links from (1)
-        url
-        |> parse_links(body)
-        |> Enum.each(fn link ->
-          [{_, broken_links}] = :ets.lookup(:urls, url)
+        links = url |> parse_links(body)
+        links |> Enum.each(fn link ->
           # q the internal links
           if internal_link?(url, link.href) do
             nq(link.href)
           end
 
-          :ets.insert(:urls, {url, [{link, broken_link?(link)} | broken_links]})
         end)
+        links |> Task.async_stream(fn link ->
+          [{_, broken_links}] = :ets.lookup(:urls, url)
+          :ets.insert(:urls, {url, [{link, broken_link?(link)} | broken_links]})
+        end, max_concurrency: 8)
+        |> Enum.to_list
 
         :ok
       oops ->

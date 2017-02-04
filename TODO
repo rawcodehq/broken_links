@@ -7,4 +7,7 @@
   Allow the user to enter the url
   +1. Analyzing the page
   +2. Get all the internal links, and q them up for analysis
-  *3. Showing all the links that have been processed
+  +3. Showing all the links that have been processed
+
+  1. Parallelize our work
+  2. Show info in a usable form
