@@ -4,8 +4,13 @@
 <ul>
   <%= for %{href: href, broken_links: broken_links} <- @broken_links do %>
   <li>
-    <%= inspect href %>
+    <%= href %>
     Number of Broken Links <%= length(broken_links) %>
+    <ul>
+      <%= for broken_link <- broken_links do %>
+        <li><%= inspect broken_link %></li>
+      <% end %>
+    </ul>
   </li>
   <% end %>
 </ul>

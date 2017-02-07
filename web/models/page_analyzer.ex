@@ -52,12 +52,13 @@ defmodule BrokenLinks.PageAnalyzer do
           end
 
         end)
-        links |> Task.async_stream(fn link ->
-          [{_, broken_links}] = :ets.lookup(:urls, url)
-          :ets.insert(:urls, {url, [{link, broken_link?(link)} | broken_links]})
-        end, max_concurrency: 8)
-        |> Enum.to_list
 
+        visited_links = links
+                        |> Task.async_stream(fn link -> {link, broken_link?(link)} end, max_concurrency: 8)
+                        |> Enum.map(fn {:ok, result} -> result end) # [{:ok, {link, true}}, ....]
+
+        [{_, links}] = :ets.lookup(:urls, url)
+        :ets.insert(:urls, {url, visited_links ++ links})
         :ok
       oops ->
         error("ERROR: #{inspect(oops)}")

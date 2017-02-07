@@ -8,7 +8,7 @@
 <ul>
   <%= for href <- @links do %>
     <li>
-      <%= link href, to: '/analyze?url=#{href}' %>
+      <%= link href, to: page_path(@conn, :analyze, url: href)%>
     </li>
   <% end %>
 </ul>

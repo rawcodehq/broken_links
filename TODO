@@ -21,3 +21,8 @@
   {link1, [broken_links]}
 ]}
 
+  # Part 5
+  1. Use .head to skip downloading
+  2. Skip fragment links
+  4. ETS overwrites and Task.async_stream
+  3. Fix errors
