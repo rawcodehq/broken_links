@@ -12,3 +12,18 @@
     </li>
   <% end %>
 </ul>
+
+<h2>Schedule website checks for broken links</h2>
+<form action="/create_schedule" method='post'>
+  <input id="url" type="text" name="url" placeholder="Enter the URL...">
+  <input type="submit" value="Schedule check" />
+</form>
+
+
+<ul>
+  <%= for {site_url, _} <- @scheduled_sites do %>
+    <li>
+      <%= site_url %>
+    </li>
+  <% end %>
+</ul>

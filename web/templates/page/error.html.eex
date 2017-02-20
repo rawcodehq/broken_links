@@ -1,0 +1,3 @@
+<h1>Analysis for '<%= @url %>'</h1>
+
+<h2 style='color:red;'>We ran into an error trying to access this url</h2>

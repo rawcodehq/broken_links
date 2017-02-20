@@ -22,7 +22,12 @@
 ]}
 
   # Part 5
+  #4. ETS overwrites and Task.async_stream
   1. Use .head to skip downloading
   2. Skip fragment links
-  4. ETS overwrites and Task.async_stream
   3. Fix errors
+
+# Part 6
+  1. Scheduled checks
+    1. create a website and schedule it
+    2. crontabl to run this every month

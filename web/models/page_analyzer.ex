@@ -12,20 +12,23 @@ defmodule BrokenLinks.PageAnalyzer do
     links
     |> Enum.filter(fn href -> URI.parse(href).host == host end)
     |> Enum.map(fn href ->
-      [{_, all_links}] = :ets.lookup(:urls, href)
-      %{href: href, broken_links: Enum.filter(all_links, fn {_, broken?} -> broken? end)}
+      case :ets.lookup(:urls, href) do
+        [{_, :error}] -> :error
+        [{_, all_links}] -> %{href: href, broken_links: Enum.filter(all_links, fn {_, broken?} -> broken? end)}
+      end
     end)
   end
 
   def nq(url) do
+    IO.puts "nqing #{inspect url}"
     if :ets.member(:urls, url) do
       debug("existing url fetching from ets")
     else
       debug("new url insert into ets")
       :ets.insert(:urls, {url, []})
       spawn(BrokenLinks.PageAnalyzer, :analyze, [url])
-      []
     end
+    IO.puts "done nqing #{inspect url}"
   end
 
   def broken_links_for(url) do
@@ -55,12 +58,14 @@ defmodule BrokenLinks.PageAnalyzer do
 
         visited_links = links
                         |> Task.async_stream(fn link -> {link, broken_link?(link)} end, max_concurrency: 8)
+                        |> Enum.to_list
                         |> Enum.map(fn {:ok, result} -> result end) # [{:ok, {link, true}}, ....]
 
         [{_, links}] = :ets.lookup(:urls, url)
         :ets.insert(:urls, {url, visited_links ++ links})
         :ok
       oops ->
+        :ets.insert(:urls, {url, :error})
         error("ERROR: #{inspect(oops)}")
         :error
     end
@@ -73,7 +78,7 @@ defmodule BrokenLinks.PageAnalyzer do
 
   defp broken_link?(%{href: href}) do
     debug("checking link: #{inspect href}")
-    case HTTPoison.get(href, [], [ ssl: [{:versions, [:'tlsv1.2']}] ]) do
+    case HTTPoison.head(href, [], [ ssl: [{:versions, [:'tlsv1.2']}] ]) do
       {:ok, %HTTPoison.Response{status_code: status_code}} -> status_code >= 400
       _ -> true
     end
@@ -92,6 +97,7 @@ defmodule BrokenLinks.PageAnalyzer do
 
   defp extract_link({_, attrs, [text]}) do
     case Enum.find(attrs, fn {k, v} -> k == "href" end) do
+      {_ , "#" <> href} -> nil
       {_ , href} -> %{text: text, href: href}
       _ -> nil
     end
